@@ -3,7 +3,7 @@ import '../data/models/player_model.dart';
 
 part 'player_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 class PlayerNotifier extends _$PlayerNotifier {
   @override
   List<Player> build() {

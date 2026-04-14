@@ -1,13 +1,16 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../providers/player_provider.dart';
-import '../widgets/team_setup_bottom_sheet.dart';
-import 'player_management_screen.dart';
-import 'settings_screen.dart';
+import 'package:random_teams_generator/providers/player_provider.dart';
+import 'package:random_teams_generator/ui/widgets/team_setup_bottom_sheet.dart';
+import 'package:random_teams_generator/ui/screens/player_management_screen.dart';
+import 'package:random_teams_generator/ui/screens/settings_screen.dart';
 
+/// The main landing screen of the application.
+/// Provides access to player management, settings, and team generation.
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
@@ -29,22 +32,28 @@ class HomeScreen extends ConsumerWidget {
                 // History button placeholder (to be implemented with Auth)
                 IconButton.filledTonal(
                   onPressed: () {
-                    // Navigate to history
+                    if (kDebugMode) {
+                      print('HomeScreen: History button pressed');
+                    }
                   },
                   icon: const Icon(LucideIcons.history),
                 ),
                 IconButton.filledTonal(
                   onPressed: () {
+                    if (kDebugMode) {
+                      print('HomeScreen: Navigating to Settings');
+                    }
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => const SettingsScreen(),
+                      ),
                     );
                   },
                   icon: const Icon(LucideIcons.settings),
                 ),
               ],
-            ),
-          ),
-
+            ), // end of Row (Header Actions)
+          ), // end of Positioned (Top Buttons)
           // Main Content
           Center(
             child: Column(
@@ -71,26 +80,36 @@ class HomeScreen extends ConsumerWidget {
                     size: 48,
                     color: Theme.of(context).colorScheme.onPrimaryContainer,
                   ),
-                ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
+                ).animate().scale(
+                  duration: 500.ms,
+                  curve: Curves.easeOutBack,
+                ), // end of Container (App Icon)
 
                 const SizedBox(height: 24),
 
                 Text(
-                  'Squadre Casuali',
-                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: -0.5,
-                      ),
-                ).animate().fadeIn(delay: 100.ms).moveY(begin: 10, end: 0),
+                      'Squadre Casuali',
+                      style: Theme.of(context).textTheme.headlineLarge
+                          ?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: -0.5,
+                          ),
+                    )
+                    .animate()
+                    .fadeIn(delay: 100.ms)
+                    .moveY(begin: 10, end: 0), // end of Text (Title)
 
                 const SizedBox(height: 8),
 
                 Text(
-                  'Equo, veloce e divertente.',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      'Equo, veloce e divertente.',
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
-                ).animate().fadeIn(delay: 200.ms).moveY(begin: 10, end: 0),
+                    )
+                    .animate()
+                    .fadeIn(delay: 200.ms)
+                    .moveY(begin: 10, end: 0), // end of Text (Tagline)
 
                 const SizedBox(height: 48),
 
@@ -101,40 +120,57 @@ class HomeScreen extends ConsumerWidget {
                     children: [
                       _ActionButton(
                         onPressed: () {
+                          if (kDebugMode) {
+                            print(
+                              'HomeScreen: Navigating to Player Management',
+                            );
+                          }
                           Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context) => const PlayerManagementScreen()),
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const PlayerManagementScreen(),
+                            ),
                           );
                         },
                         icon: LucideIcons.users,
                         label: 'Gestisci Giocatori ($playerCount)',
                         isPrimary: true,
-                      ),
+                      ), // end of _ActionButton (Manage Players)
                       const SizedBox(height: 16),
                       _ActionButton(
-                        onPressed: playerCount >= 2 ? () {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent,
-                            builder: (context) => const TeamSetupBottomSheet(),
-                          );
-                        } : null,
+                        onPressed: playerCount >= 3
+                            ? () {
+                                if (kDebugMode) {
+                                  print(
+                                    'HomeScreen: Showing Team Setup BottomSheet',
+                                  );
+                                }
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  backgroundColor: Colors.transparent,
+                                  builder: (context) =>
+                                      const TeamSetupBottomSheet(),
+                                );
+                              }
+                            : null,
                         icon: LucideIcons.play,
                         label: 'Genera Squadre',
                         isPrimary: false,
-                      ),
+                      ), // end of _ActionButton (Generate Teams)
                     ],
-                  ),
-                ),
+                  ), // end of Column (Action Buttons)
+                ), // end of Padding (Actions Container)
               ],
-            ),
-          ),
+            ), // end of Column (Hero Content)
+          ), // end of Center (Main Landing)
         ],
-      ),
-    );
+      ), // end of Stack (Background + Content)
+    ); // end of Scaffold (HomeScreen root)
   }
 }
 
+/// A custom stylized button for main actions in the HomeScreen.
 class _ActionButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final IconData icon;
@@ -151,17 +187,23 @@ class _ActionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return SizedBox(
       width: double.infinity,
       child: FilledButton.icon(
-        onPressed: onPressed != null ? () {
-          HapticFeedback.lightImpact();
-          onPressed!();
-        } : null,
+        onPressed: onPressed != null
+            ? () {
+                HapticFeedback.lightImpact();
+                onPressed!();
+              }
+            : null,
         style: FilledButton.styleFrom(
-          backgroundColor: isPrimary ? colorScheme.primary : colorScheme.secondaryContainer,
-          foregroundColor: isPrimary ? colorScheme.onPrimary : colorScheme.onSecondaryContainer,
+          backgroundColor: isPrimary
+              ? colorScheme.primary
+              : colorScheme.secondaryContainer,
+          foregroundColor: isPrimary
+              ? colorScheme.onPrimary
+              : colorScheme.onSecondaryContainer,
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(100),
@@ -172,7 +214,7 @@ class _ActionButton extends StatelessWidget {
           label,
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
-      ),
-    );
+      ), // end of FilledButton.icon
+    ); // end of SizedBox (Full Width Button)
   }
 }

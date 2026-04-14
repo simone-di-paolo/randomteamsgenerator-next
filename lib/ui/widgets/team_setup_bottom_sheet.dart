@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import '../../providers/player_provider.dart';
-import '../../providers/team_provider.dart';
-import '../screens/results_screen.dart';
+import 'package:random_teams_generator/providers/player_provider.dart';
+import 'package:random_teams_generator/providers/team_provider.dart';
+import 'package:random_teams_generator/ui/screens/results_screen.dart';
 
 class TeamSetupBottomSheet extends ConsumerStatefulWidget {
   const TeamSetupBottomSheet({super.key});

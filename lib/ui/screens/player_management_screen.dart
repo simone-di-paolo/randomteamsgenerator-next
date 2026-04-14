@@ -3,17 +3,20 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../providers/player_provider.dart';
-import '../widgets/team_setup_bottom_sheet.dart';
+import 'package:random_teams_generator/providers/player_provider.dart';
+import 'package:random_teams_generator/ui/widgets/team_setup_bottom_sheet.dart';
+import 'package:random_teams_generator/data/models/player_model.dart';
 
 class PlayerManagementScreen extends ConsumerStatefulWidget {
   const PlayerManagementScreen({super.key});
 
   @override
-  ConsumerState<PlayerManagementScreen> createState() => _PlayerManagementScreenState();
+  ConsumerState<PlayerManagementScreen> createState() =>
+      _PlayerManagementScreenState();
 }
 
-class _PlayerManagementScreenState extends ConsumerState<PlayerManagementScreen> {
+class _PlayerManagementScreenState
+    extends ConsumerState<PlayerManagementScreen> {
   final TextEditingController _controller = TextEditingController();
   final FocusNode _focusNode = FocusNode();
 
@@ -73,7 +76,10 @@ class _PlayerManagementScreenState extends ConsumerState<PlayerManagementScreen>
                         borderRadius: BorderRadius.circular(20),
                         borderSide: BorderSide.none,
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 16,
+                      ),
                     ),
                     onSubmitted: (_) => _addPlayer(),
                   ),
@@ -101,7 +107,9 @@ class _PlayerManagementScreenState extends ConsumerState<PlayerManagementScreen>
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
                     itemCount: players.length,
                     onReorder: (oldIndex, newIndex) {
-                      ref.read(playerNotifierProvider.notifier).reorderPlayers(oldIndex, newIndex);
+                      ref
+                          .read(playerNotifierProvider.notifier)
+                          .reorderPlayers(oldIndex, newIndex);
                       HapticFeedback.selectionClick();
                     },
                     itemBuilder: (context, index) {
@@ -109,7 +117,9 @@ class _PlayerManagementScreenState extends ConsumerState<PlayerManagementScreen>
                       return _PlayerTile(
                         key: ValueKey(player.id),
                         player: player,
-                        onDelete: () => ref.read(playerNotifierProvider.notifier).removePlayer(player.id),
+                        onDelete: () => ref
+                            .read(playerNotifierProvider.notifier)
+                            .removePlayer(player.id),
                       );
                     },
                   ),
@@ -117,7 +127,7 @@ class _PlayerManagementScreenState extends ConsumerState<PlayerManagementScreen>
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: players.length >= 2
+      floatingActionButton: players.length >= 3
           ? Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: SizedBox(
@@ -132,7 +142,10 @@ class _PlayerManagementScreenState extends ConsumerState<PlayerManagementScreen>
                       builder: (context) => const TeamSetupBottomSheet(),
                     );
                   },
-                  label: const Text('Genera Squadre', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  label: const Text(
+                    'Genera Squadre',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
                   icon: const Icon(LucideIcons.play),
                 ).animate().scale(duration: 300.ms, curve: Curves.easeOutBack),
               ),
@@ -148,27 +161,41 @@ class _PlayerManagementScreenState extends ConsumerState<PlayerManagementScreen>
         children: [
           GestureDetector(
             onTap: () => _focusNode.requestFocus(),
-            child: Container(
-              width: 96,
-              height: 96,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                LucideIcons.plus,
-                size: 48,
-                color: Theme.of(context).colorScheme.onPrimaryContainer,
-              ),
-            ).animate(onPlay: (controller) => controller.repeat())
-             .scale(duration: 1.seconds, begin: const Offset(1, 1), end: const Offset(1.1, 1.1), curve: Curves.easeInOut)
-             .then()
-             .scale(duration: 1.seconds, begin: const Offset(1.1, 1.1), end: const Offset(1, 1), curve: Curves.easeInOut),
+            child:
+                Container(
+                      width: 96,
+                      height: 96,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        LucideIcons.plus,
+                        size: 48,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      ),
+                    )
+                    .animate(onPlay: (controller) => controller.repeat())
+                    .scale(
+                      duration: 1.seconds,
+                      begin: const Offset(1, 1),
+                      end: const Offset(1.1, 1.1),
+                      curve: Curves.easeInOut,
+                    )
+                    .then()
+                    .scale(
+                      duration: 1.seconds,
+                      begin: const Offset(1.1, 1.1),
+                      end: const Offset(1, 1),
+                      curve: Curves.easeInOut,
+                    ),
           ),
           const SizedBox(height: 24),
           Text(
             'Nessun giocatore',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           const Padding(
@@ -189,11 +216,7 @@ class _PlayerTile extends StatelessWidget {
   final dynamic player;
   final VoidCallback onDelete;
 
-  const _PlayerTile({
-    super.key,
-    required this.player,
-    required this.onDelete,
-  });
+  const _PlayerTile({super.key, required this.player, required this.onDelete});
 
   @override
   Widget build(BuildContext context) {
