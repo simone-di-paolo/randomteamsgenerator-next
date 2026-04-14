@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'ui/screens/home_screen.dart';
 
 void main() {
   // Wrap the entire app with ProviderScope to enable Riverpod
@@ -22,9 +23,18 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorSchemeSeed: Colors.deepPurple,
+        brightness: Brightness.light,
         textTheme: GoogleFonts.outfitTextTheme(),
       ),
-      home: const InitializationScreen(),
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        colorSchemeSeed: Colors.deepPurple,
+        brightness: Brightness.dark,
+        textTheme: GoogleFonts.outfitTextTheme(
+          ThemeData(brightness: Brightness.dark).textTheme,
+        ),
+      ),
+      home: const HomeScreen(),
     );
   }
 }
