@@ -5,11 +5,32 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:random_teams_generator/core/l10n.dart';
+import 'package:random_teams_generator/providers/history_provider.dart';
 import 'package:random_teams_generator/providers/team_provider.dart';
+import 'history_screen.dart';
 import '../widgets/team_flag.dart';
 
 class ResultsScreen extends ConsumerWidget {
   const ResultsScreen({super.key});
+
+  /// Saves the current team list to the local history database.
+  Future<void> _saveTeams(BuildContext context, WidgetRef ref, dynamic teams) async {
+    if (kDebugMode) {
+      print('ResultsScreen: Saving ${teams.length} teams to history');
+    }
+    
+    await ref.read(historyNotifierProvider.notifier).saveSession(teams);
+    
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppStrings.of().teamsSavedSuccess),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
 
   /// Navigates back and shares the generated teams as text.
   void _shareTeams(BuildContext context, dynamic teams) {
@@ -17,7 +38,7 @@ class ResultsScreen extends ConsumerWidget {
       print('ResultsScreen: Sharing teams text...');
     }
     final String text = teams.map((t) => '🏁 ${t.name}:\n${t.players.map((p) => '- ${p.name}').join('\n')}').join('\n\n');
-    Share.share(text, subject: 'Le nostre Squadre!');
+    Share.share(text, subject: AppStrings.of().shareSubject);
   }
 
   @override
@@ -35,7 +56,7 @@ class ResultsScreen extends ConsumerWidget {
       backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: const Text('Le Squadre'),
+        title: Text(AppStrings.of().teamsTitle),
         leading: IconButton(
           onPressed: () => Navigator.of(context).pop(),
           icon: const Icon(LucideIcons.arrowLeft),
@@ -48,6 +69,20 @@ class ResultsScreen extends ConsumerWidget {
             },
             icon: const Icon(LucideIcons.share2),
           ),
+          IconButton(
+            onPressed: () {
+              if (kDebugMode) {
+                print('ResultsScreen: Navigating to History');
+              }
+              HapticFeedback.mediumImpact();
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const HistoryScreen(),
+                ),
+              );
+            },
+            icon: const Icon(LucideIcons.history),
+          ), // end of IconButton (History navigation)
           IconButton(
             onPressed: teams.isEmpty ? null : () {
               if (kDebugMode) {
@@ -68,11 +103,11 @@ class ResultsScreen extends ConsumerWidget {
                 children: [
                   Icon(LucideIcons.frown, size: 64, color: Theme.of(context).colorScheme.outline),
                   const SizedBox(height: 16),
-                  const Text('Nessuna squadra generata.'),
+                  Text(AppStrings.of().noTeamsGenerated),
                   const SizedBox(height: 24),
                   FilledButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Torna indietro'),
+                    child: Text(AppStrings.of().back),
                   ),
                 ],
               ), // end of Column (Empty State messaging)
@@ -137,16 +172,8 @@ class ResultsScreen extends ConsumerWidget {
         child: SizedBox(
           width: double.infinity,
           child: FloatingActionButton.extended(
-            onPressed: () {
-              if (kDebugMode) {
-                print('ResultsScreen: Save teams clicked');
-              }
-              // Placeholder for Save functionality
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Salvataggio non ancora implementato (richiede Firebase)'), behavior: SnackBarBehavior.floating),
-              );
-            },
-            label: const Text('Salva Squadre', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            onPressed: teams.isEmpty ? null : () => _saveTeams(context, ref, teams),
+            label: Text(AppStrings.of().saveTeams, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             icon: const Icon(LucideIcons.save),
           ), // end of FloatingActionButton.extended (Save Action)
         ), // end of SizedBox (Full Width FAB)

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:random_teams_generator/core/l10n.dart';
 import 'package:random_teams_generator/providers/player_provider.dart';
 import 'package:random_teams_generator/providers/team_provider.dart';
 import 'package:random_teams_generator/ui/screens/results_screen.dart';
@@ -40,14 +41,14 @@ class _TeamSetupBottomSheetState extends ConsumerState<TeamSetupBottomSheet> {
           const SizedBox(height: 24),
           
           Text(
-            'Impostazioni Squadre',
+            AppStrings.of().generateTeams,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
           
           const SizedBox(height: 32),
           
           Text(
-            'Quante squadre vuoi creare?',
+            AppStrings.of().numTeamsQuestion,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
@@ -87,7 +88,7 @@ class _TeamSetupBottomSheetState extends ConsumerState<TeamSetupBottomSheet> {
           const SizedBox(height: 16),
           
           Text(
-            'Da ${playerCount ~/ _numTeams} a ${(playerCount / _numTeams).ceil()} giocatori per squadra',
+            AppStrings.of().playersPerTeam(playerCount ~/ _numTeams, (playerCount / _numTeams).ceil()),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
@@ -111,7 +112,7 @@ class _TeamSetupBottomSheetState extends ConsumerState<TeamSetupBottomSheet> {
                   borderRadius: BorderRadius.circular(100),
                 ),
               ),
-              child: const Text('Genera!', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              child: Text(AppStrings.of().generateButton, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ),
           ),
         ],

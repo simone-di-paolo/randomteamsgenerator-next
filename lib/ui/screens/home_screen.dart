@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:random_teams_generator/core/l10n.dart';
+import 'package:random_teams_generator/ui/screens/history_screen.dart';
 import 'package:random_teams_generator/providers/player_provider.dart';
 import 'package:random_teams_generator/ui/widgets/team_setup_bottom_sheet.dart';
 import 'package:random_teams_generator/ui/screens/player_management_screen.dart';
@@ -29,12 +31,17 @@ class HomeScreen extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // History button placeholder (to be implemented with Auth)
+                // History button - Now opens the local history screen
                 IconButton.filledTonal(
                   onPressed: () {
                     if (kDebugMode) {
-                      print('HomeScreen: History button pressed');
+                      print('HomeScreen: Navigating to History');
                     }
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const HistoryScreen(),
+                      ),
+                    );
                   },
                   icon: const Icon(LucideIcons.history),
                 ),
@@ -88,7 +95,7 @@ class HomeScreen extends ConsumerWidget {
                 const SizedBox(height: 24),
 
                 Text(
-                      'Squadre Casuali',
+                      AppStrings.of().homeHeadline,
                       style: Theme.of(context).textTheme.headlineLarge
                           ?.copyWith(
                             fontWeight: FontWeight.bold,
@@ -102,7 +109,7 @@ class HomeScreen extends ConsumerWidget {
                 const SizedBox(height: 8),
 
                 Text(
-                      'Equo, veloce e divertente.',
+                      AppStrings.of().homeTagline,
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
@@ -133,7 +140,7 @@ class HomeScreen extends ConsumerWidget {
                           );
                         },
                         icon: LucideIcons.users,
-                        label: 'Gestisci Giocatori ($playerCount)',
+                        label: '${AppStrings.of().managePlayers} ($playerCount)',
                         isPrimary: true,
                       ), // end of _ActionButton (Manage Players)
                       const SizedBox(height: 16),
@@ -155,7 +162,7 @@ class HomeScreen extends ConsumerWidget {
                               }
                             : null,
                         icon: LucideIcons.play,
-                        label: 'Genera Squadre',
+                        label: AppStrings.of().generateTeams,
                         isPrimary: false,
                       ), // end of _ActionButton (Generate Teams)
                     ],

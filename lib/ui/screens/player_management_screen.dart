@@ -4,9 +4,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:random_teams_generator/core/l10n.dart';
 import 'package:random_teams_generator/providers/player_provider.dart';
 import 'package:random_teams_generator/ui/widgets/team_setup_bottom_sheet.dart';
-import 'package:random_teams_generator/data/models/player_model.dart';
 
 class PlayerManagementScreen extends ConsumerStatefulWidget {
   const PlayerManagementScreen({super.key});
@@ -39,7 +39,7 @@ class _PlayerManagementScreenState
         }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(e.toString().replaceAll('Exception: ', '')),
+          content: Text(e.toString().replaceAll('Exception: ', '') == 'Player already exists' ? AppStrings.of().playerExistsError : e.toString().replaceAll('Exception: ', '')),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -61,7 +61,7 @@ class _PlayerManagementScreenState
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
       appBar: AppBar(
-        title: const Text('Gestisci Giocatori'),
+        title: Text(AppStrings.of().playerManagementTitle),
         backgroundColor: Colors.transparent,
         centerTitle: true,
       ), // end of AppBar (Management Header)
@@ -79,8 +79,8 @@ class _PlayerManagementScreenState
                     autofocus: true, // Auto-open keyboard on entry
                     textInputAction: TextInputAction.done,
                     onSubmitted: (_) => _addPlayer(), // Add player on Enter key
-                    decoration: InputDecoration(
-                      hintText: 'Nome giocatore...',
+                      decoration: InputDecoration(
+                        hintText: AppStrings.of().addPlayerPlaceholder,
                       filled: true,
                       fillColor: Theme.of(context).colorScheme.surface,
                       border: OutlineInputBorder(
@@ -159,9 +159,9 @@ class _PlayerManagementScreenState
                       builder: (context) => const TeamSetupBottomSheet(),
                     );
                   },
-                  label: const Text(
-                    'Genera Squadre',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  label: Text(
+                    AppStrings.of().generateTeams,
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   icon: const Icon(LucideIcons.play),
                 ).animate().scale(duration: 300.ms, curve: Curves.easeOutBack), // end of FloatingActionButton.extended
@@ -217,16 +217,16 @@ class _EmptyStateView extends StatelessWidget {
         ), // end of GestureDetector
         const SizedBox(height: 24),
         Text(
-          'Aggiungi Giocatori',
+          AppStrings.of().addPlayers,
           style: Theme.of(
             context,
           ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ), // end of Text (Empty State title)
         const SizedBox(height: 8),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 48),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 48),
           child: Text(
-            'Inserisci i nomi per iniziare a creare le squadre.',
+            AppStrings.of().enterNamesToStart,
             textAlign: TextAlign.center,
           ), // end of Text (Empty State description)
         ),

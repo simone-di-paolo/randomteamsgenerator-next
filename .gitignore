@@ -56,4 +56,6 @@ app.*.map.json
 *.g.dart
 *.p.dart
 *.drift.dart
+*.freezed.dart
+*.mocks.dart
 

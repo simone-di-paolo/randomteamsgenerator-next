@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../data/models/team_model.dart';
@@ -22,7 +23,7 @@ class TeamNotifier extends _$TeamNotifier {
 
   /// Generates [numTeams] random teams and distributes all players from PlayerProvider.
   ///
-  /// Each team is assigned random colors, an adjective/animal name, and a pattern.
+  /// Each team is assigned random colors (2 or 3), an adjective/animal name, and a pattern.
   /// If players list is empty or [numTeams] is less than 1, operation is aborted.
   void generateTeams(int numTeams) {
     final players = ref.read(playerNotifierProvider);
@@ -53,38 +54,62 @@ class TeamNotifier extends _$TeamNotifier {
       playerBuckets[i % numTeams].add(shuffledPlayers[i]);
     }
 
+    final locale = ui.PlatformDispatcher.instance.locale.languageCode;
+    final lang = (locale == 'it') ? 'it' : 'en';
+    
+    // Copy and shuffle available words to ensure no repetition within the same session
+    final List<String> availableAdjectives = List<String>.from(TeamConstants.adjectives[lang]!)..shuffle(random);
+    final List<String> availableNouns = List<String>.from(TeamConstants.nouns[lang]!)..shuffle(random);
+
     // Now build the Team objects using the buckets
-    final List<Team> newTeams = List.generate(numTeams, (i) {
-      final color1 =
-          TeamConstants.colors[random.nextInt(TeamConstants.colors.length)];
-      var color2 =
-          TeamConstants.colors[random.nextInt(TeamConstants.colors.length)];
-      while (color1 == color2) {
-        color2 =
-            TeamConstants.colors[random.nextInt(TeamConstants.colors.length)];
+    final List<Team> newTeams = [];
+    for (var i = 0; i < numTeams; i++) {
+      // Determine if team will have 2 or 3 colors
+      final numColors = random.nextBool() ? 2 : 3;
+      final List<String> teamColors = [];
+      
+      while (teamColors.length < numColors) {
+        final color = TeamConstants.colors[random.nextInt(TeamConstants.colors.length)];
+        if (!teamColors.contains(color)) {
+          teamColors.add(color);
+        }
       }
 
-      final adj = TeamConstants
-          .adjectives[random.nextInt(TeamConstants.adjectives.length)];
-      final animal =
-          TeamConstants.animals[random.nextInt(TeamConstants.animals.length)];
+      String name;
+      // Pick a unique adjective and noun pair if available
+      if (availableAdjectives.isNotEmpty && availableNouns.isNotEmpty) {
+        final adj = availableAdjectives.removeAt(0);
+        final noun = availableNouns.removeAt(0);
+        
+        if (lang == 'it') {
+          name = '${_capitalize(noun)} ${_capitalize(adj)}';
+        } else {
+          name = '${_capitalize(adj)} ${_capitalize(noun)}';
+        }
+      } else {
+        // Fallback in the extremely rare case we run out of words
+        final adj = TeamConstants.adjectives[lang]![random.nextInt(TeamConstants.adjectives[lang]!.length)];
+        final noun = TeamConstants.nouns[lang]![random.nextInt(TeamConstants.nouns[lang]!.length)];
+        name = (lang == 'it') ? '${_capitalize(noun)} ${_capitalize(adj)}' : '${_capitalize(adj)} ${_capitalize(noun)}';
+      }
+
       final pattern =
           TeamConstants.patterns[random.nextInt(TeamConstants.patterns.length)];
 
       if (kDebugMode) {
         print(
-          'TeamNotifier: Building team "$adj $animal" with ${playerBuckets[i].length} players',
+          'TeamNotifier: Building team "$name" with ${playerBuckets[i].length} players and ${teamColors.length} colors',
         );
       }
 
-      return Team(
+      newTeams.add(Team(
         id: 'team-$i',
-        name: '$adj $animal',
-        colors: [color1, color2],
+        name: name,
+        colors: teamColors,
         pattern: pattern,
-        players: playerBuckets[i], // Assign the pre-filled list
-      );
-    });
+        players: playerBuckets[i],
+      ));
+    }
 
     if (kDebugMode) {
       print('TeamNotifier: FINISH. Total teams generated: ${newTeams.length}');
@@ -99,5 +124,10 @@ class TeamNotifier extends _$TeamNotifier {
       print('TeamNotifier: Clearing all teams');
     }
     state = [];
+  }
+
+  String _capitalize(String text) {
+    if (text.isEmpty) return text;
+    return text[0].toUpperCase() + text.substring(1);
   }
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../data/models/player_model.dart';
 
@@ -35,7 +36,19 @@ class PlayerNotifier extends _$PlayerNotifier {
     state = items;
   }
 
+  /// Clears the current list and sets players from a list of names.
+  void setPlayersFromNames(List<String> names) {
+    if (kDebugMode) {
+      print('PlayerNotifier: Loading ${names.length} players from history');
+    }
+    state = names.map((name) => Player(name: name)).toList();
+  }
+
+  /// Clears the entire player list.
   void clearPlayers() {
+    if (kDebugMode) {
+      print('PlayerNotifier: Clearing all players');
+    }
     state = [];
   }
 }
